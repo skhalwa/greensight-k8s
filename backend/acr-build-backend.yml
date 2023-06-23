@@ -1,0 +1,68 @@
+stages:
+- stage: Push
+  displayName: Deploy To ACR
+  jobs: 
+  - job: stageing
+    displayName: Push
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/stageing')
+    steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'gsvikrant.azurecr.io'
+          repository: backend
+          command: 'buildAndPush'
+          Dockerfile: '**/api/Dockerfile'
+
+      - task: CopyPublishBuildArtifacts@1
+        inputs:
+          Contents: '**'
+          ArtifactName: 'drop'
+          ArtifactType: 'Container'
+          
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+  
+  - job: dev
+    displayName: Push
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+    steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'gsvikrant.azurecr.io'
+          repository: backend_dev
+          command: 'buildAndPush'
+          Dockerfile: '**/api/Dockerfile'
+          tags: 'dev'
+      - task: CopyPublishBuildArtifacts@1
+        inputs:
+          Contents: '**'
+          ArtifactName: 'drop'
+          ArtifactType: 'Container'
+          
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+
+  - job: production
+    displayName: Push
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/production')
+    steps:
+      - task: CopyPublishBuildArtifacts@1
+        inputs:
+          Contents: '**'
+          ArtifactName: 'drop'
+          ArtifactType: 'Container'
+          
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+  
+    
+
