@@ -1,0 +1,71 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: gs
+spec:
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: backend
+        image: gsvikrant.azurecr.io/backend:backend
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4000
+        resources:
+          requests:
+            cpu: 150m
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: gs
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer: "true"
+spec:
+  selector:
+    app: backend
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 4000
+    targetPort: 4000
+
+
+--- 
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend
+  namespace: gs
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 40
+
