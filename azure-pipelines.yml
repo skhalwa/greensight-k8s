@@ -4,75 +4,85 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+
+  batch: true
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - /backend
 
 pool:
   vmImage: ubuntu-latest
 
-stages:
-- stage: Push
-  displayName: Deploy To ACR
-  jobs:
-    - job: staging
-      displayName: Push
-      condition: eq(variable['Build.SourceBranch'], 'refs/heads/staging')
-      steps:
-        - task: Docker@2
-          inputs:
-            containerRegistry: 'dockerimages'
-            repository: 'backend'
-            command: 'buildAndPush'
-            Dockerfile: '**/backend/Dockerfile'
-        - task: CopyPublishBuildArtifacts@1
-          inputs:
-            CopyRoot: '$(Agent.BuildDirectory)'
-            Contents: '**'
-            ArtifactName: 'drop'
-            ArtifactType: 'Container'
-        - task: PublishBuildArtifacts@1
-          inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-            ArtifactName: 'drop'
-            publishLocation: 'Container'
-        
-    - job: dev
-      displayName: Push
-      condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
-      steps:
-        - task: Docker@2
-          inputs:
-            containerRegistry: 'dockerimages'
-            repository: backend_dev
-            command: 'buildAndPush'
-            Dockerfile: '**/backend/Dockerfile'
-            tags: 'dev'
-        - task: CopyPublishBuildArtifacts@1
-          inputs:
-            Contents: '**'
-            ArtifactName: 'drop'
-            ArtifactType: 'Container'
-            
-        - task: PublishBuildArtifacts@1
-          inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-            ArtifactName: 'drop'
-            publishLocation: 'Container'
+extends:
+  template: acr-build-api.yml
 
-    - job: production
-      displayName: Push
-      condition: eq(variables['Build.SourceBranch'], 'refs/heads/production')
-      steps:
-        - task: CopyPublishBuildArtifacts@1
-          inputs:
-            Contents: '**'
-            ArtifactName: 'drop'
-            ArtifactType: 'Container'
+# stages:
+# - stage: Push
+#   displayName: Deploy To ACR
+#   jobs:
+#     - job: staging
+#       displayName: Push
+#       condition: eq(variable['Build.SourceBranch'], 'refs/heads/staging')
+#       steps:
+#         - task: Docker@2
+#           inputs:
+#             containerRegistry: 'dockerimages'
+#             repository: 'backend'
+#             command: 'buildAndPush'
+#             Dockerfile: '**/backend/Dockerfile'
+#         - task: CopyPublishBuildArtifacts@1
+#           inputs:
+#             CopyRoot: '$(Agent.BuildDirectory)'
+#             Contents: '**'
+#             ArtifactName: 'drop'
+#             ArtifactType: 'Container'
+#         - task: PublishBuildArtifacts@1
+#           inputs:
+#             PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#             ArtifactName: 'drop'
+#             publishLocation: 'Container'
+        
+#     - job: dev
+#       displayName: Push
+#       condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+#       steps:
+#         - task: Docker@2
+#           inputs:
+#             containerRegistry: 'dockerimages'
+#             repository: backend_dev
+#             command: 'buildAndPush'
+#             Dockerfile: '**/backend/Dockerfile'
+#             tags: 'dev'
+#         - task: CopyPublishBuildArtifacts@1
+#           inputs:
+#             Contents: '**'
+#             ArtifactName: 'drop'
+#             ArtifactType: 'Container'
             
-        - task: PublishBuildArtifacts@1
-          inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-            ArtifactName: 'drop'
-            publishLocation: 'Container'
+#         - task: PublishBuildArtifacts@1
+#           inputs:
+#             PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#             ArtifactName: 'drop'
+#             publishLocation: 'Container'
+
+#     - job: production
+#       displayName: Push
+#       condition: eq(variables['Build.SourceBranch'], 'refs/heads/production')
+#       steps:
+#         - task: CopyPublishBuildArtifacts@1
+#           inputs:
+#             Contents: '**'
+#             ArtifactName: 'drop'
+#             ArtifactType: 'Container'
+            
+#         - task: PublishBuildArtifacts@1
+#           inputs:
+#             PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#             ArtifactName: 'drop'
+#             publishLocation: 'Container'
 
 
 # stages:
