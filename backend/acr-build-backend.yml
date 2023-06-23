@@ -2,9 +2,9 @@ stages:
 - stage: Push
   displayName: Deploy To ACR
   jobs: 
-  - job: stageing
+  - job: staging
     displayName: Push
-    condition: eq(variables['Build.SourceBranch'], 'refs/heads/stageing')
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/staging')
     steps:
       - task: Docker@2
         inputs:
