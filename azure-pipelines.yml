@@ -1,0 +1,80 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+
+stages:
+- stage: Push
+  displayName: Deploy To ACR
+  jobs: 
+  - job: staging
+    displayName: Push
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/staging')
+    steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'gsvikrant.azurecr.io'
+          repository: backend
+          command: 'buildAndPush'
+          Dockerfile: '**/api/Dockerfile'
+
+      - task: CopyPublishBuildArtifacts@1
+        inputs:
+          Contents: '**'
+          ArtifactName: 'drop'
+          ArtifactType: 'Container'
+          
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+  
+  - job: dev
+    displayName: Push
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+    steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'gsvikrant.azurecr.io'
+          repository: backend_dev
+          command: 'buildAndPush'
+          Dockerfile: '**/api/Dockerfile'
+          tags: 'dev'
+      - task: CopyPublishBuildArtifacts@1
+        inputs:
+          Contents: '**'
+          ArtifactName: 'drop'
+          ArtifactType: 'Container'
+          
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+
+  - job: production
+    displayName: Push
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/production')
+    steps:
+      - task: CopyPublishBuildArtifacts@1
+        inputs:
+          Contents: '**'
+          ArtifactName: 'drop'
+          ArtifactType: 'Container'
+          
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+  
+    
+
