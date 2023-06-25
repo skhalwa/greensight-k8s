@@ -2,7 +2,7 @@ trigger:
   batch: true
   branches:
     include:
-    - stageing
+    - production
 
   paths:
     include:
@@ -11,6 +11,66 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-extends:
-  template: acr-build-backend.yml
+# extends:
+#   template: acr-build-backend.yml
 
+stages:
+- stage: Push
+  displayName: Deploy To ACR
+  jobs: 
+  - job: staging
+    displayName: Push
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/staging')
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'k8s-connection'
+        repository: 'backend'
+        command: 'buildAndPush'
+        Dockerfile: '**/backend/Dockerfile'
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(agent.builddirectory)'
+        Contents: '**'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+      
+  - job: dev
+    displayName: Push
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'k8s-connection'
+        repository: 'backend'
+        command: 'buildAndPush'
+        Dockerfile: '**/backend/Dockerfile'
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(agent.builddirectory)'
+        Contents: '**'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+      
+  - job: production
+    displayName: Push
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/production')
+    steps:
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(agent.builddirectory)'
+        Contents: '**'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
