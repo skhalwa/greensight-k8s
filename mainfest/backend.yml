@@ -19,7 +19,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: backend
-        image: gsvikrant.azurecr.io/backend:backend
+        image: dockergreennew.azurecr.io/backend:backend
         imagePullPolicy: Always
         ports:
         - containerPort: 4000

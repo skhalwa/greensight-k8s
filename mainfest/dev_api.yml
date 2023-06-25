@@ -19,7 +19,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: api
-        image: gsvikrant.azurecr.io/api
+        image: dockergreennew.azurecr.io/api
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
