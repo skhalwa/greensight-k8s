@@ -30,7 +30,7 @@ stages:
         Dockerfile: '**/backend/Dockerfile'
     - task: CopyFiles@2
       inputs:
-        SourceFolder: '$(agent.builddirectory)'
+        SourceFolder: '$(agent.builddirectory)/s'
         Contents: '**'
         TargetFolder: '$(build.artifactstagingdirectory)'
     - task: PublishBuildArtifacts@1
@@ -51,7 +51,7 @@ stages:
         Dockerfile: '**/backend/Dockerfile'
     - task: CopyFiles@2
       inputs:
-        SourceFolder: '$(agent.builddirectory)'
+        SourceFolder: '$(agent.builddirectory)/s'
         Contents: '**'
         TargetFolder: '$(build.artifactstagingdirectory)'
     - task: PublishBuildArtifacts@1
@@ -66,7 +66,7 @@ stages:
     steps:
     - task: CopyFiles@2
       inputs:
-        SourceFolder: '$(agent.builddirectory)'
+        SourceFolder: '$(agent.builddirectory)/s'
         Contents: '**'
         TargetFolder: '$(build.artifactstagingdirectory)'
     - task: PublishBuildArtifacts@1
