@@ -2,7 +2,7 @@ trigger:
   batch: true
   branches:
     include:
-    - staging
+    - main
 
   paths:
     include:
@@ -30,7 +30,7 @@ stages:
         Dockerfile: '**/backend/Dockerfile'
     - task: CopyFiles@2
       inputs:
-        SourceFolder: '$(agent.builddirectory)/s'
+        SourceFolder: '$(agent.builddirectory)'
         Contents: '**'
         TargetFolder: '$(build.artifactstagingdirectory)'
     - task: PublishBuildArtifacts@1
@@ -51,7 +51,7 @@ stages:
         Dockerfile: '**/backend/Dockerfile'
     - task: CopyFiles@2
       inputs:
-        SourceFolder: '$(agent.builddirectory)/s'
+        SourceFolder: '$(agent.builddirectory)'
         Contents: '**'
         TargetFolder: '$(build.artifactstagingdirectory)'
     - task: PublishBuildArtifacts@1
@@ -66,7 +66,7 @@ stages:
     steps:
     - task: CopyFiles@2
       inputs:
-        SourceFolder: '$(agent.builddirectory)/s'
+        SourceFolder: '$(agent.builddirectory)'
         Contents: '**'
         TargetFolder: '$(build.artifactstagingdirectory)'
     - task: PublishBuildArtifacts@1
