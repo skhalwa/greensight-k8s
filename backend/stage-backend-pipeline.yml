@@ -1,15 +1,15 @@
-trigger:
-  batch: true
-  branches:
-    include:
-    - staging
+# trigger:
+#   batch: true
+#   branches:
+#     include:
+#     - staging
 
-  paths:
-    include:
-    - /backend
+#   paths:
+#     include:
+#     - /backend
 
-pool:
-  vmImage: 'ubuntu-latest'
+# pool:
+#   vmImage: 'ubuntu-latest'
 
 # 
 trigger:
